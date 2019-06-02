@@ -9,7 +9,6 @@ import io
 import requests
 import json
 
-
 CONFIGURATION_ENCODING_FORMAT = "utf-8"
 CONFIG_INI = "config.ini"
 
@@ -36,7 +35,7 @@ def read_configuration_file(configuration_file):
 
 def subscribe_intent_callback(hermes, intentMessage):
     conf = read_configuration_file(CONFIG_INI)
-    hermes.publish_continue_session(intentMessage.session_id, u"Ok,",["ryanrudak:searchduckDuckGo"])
+    hermes.publish_continue_session(intentMessage.session_id, u"Ok,",["ryanrudak:searchDuckDuckGo"])
     action_wrapperOrdreDirect(hermes, intentMessage, conf)
 
 
@@ -52,7 +51,8 @@ def action_wrapperOrdre(hermes, intentMessage, conf):
             # ?format=json&pretty=1&lang=de&q=
             query_url = "{}/format=json&pretty=1&lang={}&q={}".format(searchurl, lang, article)
             results = requests.get(query_url)
-            print("Ergebns: "+str(results.AbstractText))
+            jsonresponse = result.json()
+            print("Ergebns: "+str(jsonresponse.AbstractText))
             summary = results.AbstractText
             hermes.publish_end_session(intentMessage.session_id, summary)
         except:
