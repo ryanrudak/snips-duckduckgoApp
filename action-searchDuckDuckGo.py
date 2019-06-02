@@ -36,10 +36,10 @@ def read_configuration_file(configuration_file):
 def subscribe_intent_callback(hermes, intentMessage):
     conf = read_configuration_file(CONFIG_INI)
     hermes.publish_continue_session(intentMessage.session_id, u"Ok,",["ryanrudak:searchDuckDuckGo"])
-    action_wrapperOrdreDirect(hermes, intentMessage, conf)
+    action_wrapper(hermes, intentMessage, conf)
 
 
-def action_wrapperOrdre(hermes, intentMessage, conf):
+def action_wrapper(hermes, intentMessage, conf):
     # wenn der Indikator ein entsprechendes Wort enthält
     if len(intentMessage.slots.article_indicator) > 0:
         # Schlagwort, nachdem gesucht werden soll in Variable 'article' speichern
@@ -49,11 +49,13 @@ def action_wrapperOrdre(hermes, intentMessage, conf):
         
         try:
             # ?format=json&pretty=1&lang=de&q=
-            query_url = "{}/format=json&pretty=1&lang={}&q={}".format(searchurl, lang, article)
-            results = requests.get(query_url)
-            jsonresponse = result.json()
-            print("Ergebns: "+str(jsonresponse.AbstractText))
-            summary = jsonresponse.AbstractText
+            query_url = "{}/?q={}&format=json&pretty=1&lang={}".format(searchurl, article, lang)
+            print("Query_URL: "+str(query_url))
+            headers = {"Accept-Language": "de"}
+            results = requests.get(query_url, headers=headers)
+            jsonresponse = results.json()
+            print("Ergebns: "+str(jsonresponse["AbstractText"]))
+            summary = jsonresponse["AbstractText"]
             hermes.publish_end_session(intentMessage.session_id, summary)
         except:
             print("Leider ist ein Fehler aufgetreten:"+str(sys.exc_info()[0]))
@@ -64,5 +66,5 @@ def action_wrapperOrdre(hermes, intentMessage, conf):
 if __name__ == "__main__":
     mqtt_opts = MqttOptions()
     with Hermes(mqtt_options=mqtt_opts) as h:
-        h.subscribe_intent("ryanrudak:searchduckDuckGo", subscribe_intent_callback)\
+        h.subscribe_intent("ryanrudak:searchDuckDuckGo", subscribe_intent_callback)\
         .start()
