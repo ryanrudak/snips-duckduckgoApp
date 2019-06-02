@@ -53,7 +53,7 @@ def action_wrapperOrdre(hermes, intentMessage, conf):
             results = requests.get(query_url)
             jsonresponse = result.json()
             print("Ergebns: "+str(jsonresponse.AbstractText))
-            summary = results.AbstractText
+            summary = jsonresponse.AbstractText
             hermes.publish_end_session(intentMessage.session_id, summary)
         except:
             print("Leider ist ein Fehler aufgetreten:"+str(sys.exc_info()[0]))
